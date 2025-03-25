@@ -1,163 +1,93 @@
-/*import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from "react";
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function CountdownLightSwitch() {
+  const [theme, setTheme] = useState("light");
+  const [timeLeft, setTimeLeft] = useState(30); // Countdown starts at 30
+  const [isRunning, setIsRunning] = useState(false);
+
+  // Toggle between light and dark themes
+  const toggleTheme = () => {
+    setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
+  };
+
+  // Start the countdown timer
+  useEffect(() => {
+    let timer;
+    if (isRunning && timeLeft > 0) {
+      timer = setInterval(() => {
+        setTimeLeft((prevTime) => prevTime - 1);
+      }, 1000);
+    } else if (timeLeft === 0) {
+      setIsRunning(false); // Stop the timer when it reaches 0
+    }
+    return () => clearInterval(timer);
+  }, [isRunning, timeLeft]);
+
+  // Calculate progress bar width percentage
+  const progressPercentage = ((30 - timeLeft) / 30) * 100;
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+    <div className={`container ${theme}`}>
+      <h1>Countdown & Theme Switch</h1>
+
+      <button onClick={toggleTheme} className="toggle-btn">
+        Switch to {theme === "light" ? "Dark" : "Light"} Mode
+      </button>
+
+      <div className="timer">
+        <h2>Time Left: {timeLeft}s</h2>
+        <button onClick={() => setIsRunning(true)} disabled={isRunning}>
+          Start Countdown
         </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+
+      <div className="progress-bar">
+        <div className="progress" style={{ width: `${progressPercentage}%` }}></div>
+      </div>
+
+      <style>
+        {`
+          .container {
+            text-align: center;
+            padding: 20px;
+            transition: background 0.3s, color 0.3s;
+          }
+          .light {
+            background: #fff;
+            color: #000;
+          }
+          .dark {
+            background: #222;
+            color: #fff;
+          }
+          .toggle-btn {
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+            border: none;
+            background: #007bff;
+            color: white;
+            border-radius: 5px;
+          }
+          .timer {
+            margin: 20px;
+            font-size: 1.5rem;
+          }
+          .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #ddd;
+            border-radius: 5px;
+            margin-top: 10px;
+          }
+          .progress {
+            height: 100%;
+            background: #28a745;
+            border-radius: 5px;
+            transition: width 1s linear;
+          }
+        `}
+      </style>
+    </div>
+  );
 }
-
-export default App
-*/
-import { useState } from "react";
-
-function App() {
-    const [formData, setFormData] = useState({
-        userName: "",
-        email: "",
-        occupation: "Student",
-        gender: "",
-        languages: [],
-    });
-
-    const handleChange = (event) => {
-        const { name, value, type, checked } = event.target;
-
-        if (type === "checkbox") {
-            setFormData((prev) => ({
-                ...prev,
-                languages: checked
-                    ? [...prev.languages, value]
-                    : prev.languages.filter((lang) => lang !== value),
-            }));
-        } else {
-            setFormData((prev) => ({
-                ...prev,
-                [name]: value,
-            }));
-        }
-    };
-
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        console.log(formData);
-    };
-
-    return (
-        <div className="App">
-            <form onSubmit={handleSubmit}>
-                <label>User Name</label>
-                <input
-                    type="text"
-                    name="userName"
-                    value={formData.userName}
-                    onChange={handleChange}
-                />
-
-                <label>Email</label>
-                <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                />
-
-                <label>Occupation</label>
-                <select name="occupation" value={formData.occupation} onChange={handleChange}>
-                    <option value="Student">Student</option>
-                    <option value="Professional">Professional</option>
-                    <option value="Other">Other</option>
-                </select>
-
-                <label>Gender</label>
-                <div>
-                    <input
-                        type="radio"
-                        name="gender"
-                        value="Male"
-                        checked={formData.gender === "Male"}
-                        onChange={handleChange}
-                    />
-                    <label>Male</label>
-
-                    <input
-                        type="radio"
-                        name="gender"
-                        value="Female"
-                        checked={formData.gender === "Female"}
-                        onChange={handleChange}
-                    />
-                    <label>Female</label>
-
-                    <input
-                        type="radio"
-                        name="gender"
-                        value="Other"
-                        checked={formData.gender === "Other"}
-                        onChange={handleChange}
-                    />
-                    <label>Other</label>
-                </div>
-
-                <label>Languages</label>
-                <div>
-                    <input
-                        type="checkbox"
-                        name="languages"
-                        value="HTML"
-                        checked={formData.languages.includes("HTML")}
-                        onChange={handleChange}
-                    />
-                    <label>HTML</label>
-
-                    <input
-                        type="checkbox"
-                        name="languages"
-                        value="CSS"
-                        checked={formData.languages.includes("CSS")}
-                        onChange={handleChange}
-                    />
-                    <label>CSS</label>
-
-                    <input
-                        type="checkbox"
-                        name="languages"
-                        value="JavaScript"
-                        checked={formData.languages.includes("JavaScript")}
-                        onChange={handleChange}
-                    />
-                    <label>JavaScript</label>
-                </div>
-
-                <button type="submit">Submit</button>
-            </form>
-        </div>
-    );
-}
-
-export default App;
